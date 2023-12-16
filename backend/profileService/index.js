@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config()
+var cors = require('cors')
+
 
 const app = express();
 const port = process.env.PORT;
@@ -8,6 +10,8 @@ const port = process.env.PORT;
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(express.json());
+app.use(cors())
+
 
 app.get('/health', (req,res)=>{
     res.send({status: 'OK'})
