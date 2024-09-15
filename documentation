@@ -1,0 +1,53 @@
+aws configure
+pip install boto3
+
+-frontend Dockerfile
+  FROM node:14
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+
+-backend Dockerfile
+
+    FROM node:14
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 5000
+CMD ["npm", "start"]
+
+- Push Docker Image to ECR
+
+docker build -t frontend ./frontend
+docker build -t backend ./backend
+
+-Create ECR Repositories for both Components
+
+aws ecr create-repository --repository-name frontend-repo
+aws ecr create-repository --repository-name backend-repo
+
+
+- Push Images to ECR
+
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+docker tag frontend:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/frontend-repo:latest
+docker tag backend:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/backend-repo:latest
+docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/frontend-repo:latest
+docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/backend-repo:latest
+
+
+Push the MERN Application to AWS CodeCommit
+
+-Create codecommit repository:
+
+aws codecommit create-repository --repository-name MERNAppRepo
+
+git remote add codecommit https://git-codecommit.<region>.amazonaws.com/v1/repos/MERNAppRepo
+git push codecommit main
+
+
+
